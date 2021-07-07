@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<appenders>
+    <!-- ref: https://logging.apache.org/log4j/log4j-2.0/manual/configuration.html -->
+    <Console name="STDOUT_JSON">
+        <JsonLayout complete="false" compact="true" eventEol="true" properties="false" propertiesAsList="false"
+                    objectMessageAsJsonObject="true">
+            <!-- ref: https://wiki.daumkakao.com/display/developerguide/99.+FAQ+-+hermes -->
+            <KeyValuePair key="time" value="$${date:yyyy-MM-dd' 'HH:mm:ss.SSS}"/>
+        </JsonLayout>
+    </Console>
+
+    <Console name="STDOUT">
+        <PatternLayout disableAnsi="false">
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} %highlight{%-5level}{STYLE=Logback} %thread %logger.%M - %msg%n
+            </Pattern>
+        </PatternLayout>
+    </Console>
+
+    <!-- ref: https://docs.sentry.io/platforms/java/guides/log4j2/ -->
+    <Sentry name="SENTRY"
+            minimumBreadcrumbLevel="WARN"
+            minimumEventLevel="ERROR"
+    />
+</appenders>

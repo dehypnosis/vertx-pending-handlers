@@ -1,0 +1,4 @@
+# default configuration is based on alpha environment
+# overriding profiles strategy is replacement for lists and merging for properties.
+
+profile: "ALPHA"

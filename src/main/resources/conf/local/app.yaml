@@ -1,0 +1,3 @@
+# local environment configuration overriding (requires VPN connection)
+
+profile: "LOCAL"

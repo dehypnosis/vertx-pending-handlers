@@ -1,0 +1,10 @@
+.idea
+.gradle
+.git
+.gitignore
+README.md
+Dockerfile
+.vertx
+build
+set-java-opts.out
+

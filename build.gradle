@@ -1,0 +1,96 @@
+plugins {
+    id 'java' apply true
+    id 'application' apply true
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
+}
+
+repositories {
+    mavenCentral()
+    maven { url "http://maven.daumcorp.com/content/groups/daum-public" }
+    maven { url "http://maven.daumcorp.com/content/groups/daum-localplatform-group" }
+    maven { url "http://maven.daumcorp.com/content/groups/dk-t9-group" }
+    maven { url "http://repo.maven.apache.org/maven2" }
+    maven { url "https://oss.sonatype.org/content/repositories/iovertx-3684/" }
+}
+
+dependencies {
+    // application
+    implementation 'com.google.inject:guice:5.0.1'
+    implementation 'io.vertx:vertx-core:4.1.0'
+    implementation 'io.vertx:vertx-config:4.1.0'
+    implementation 'io.vertx:vertx-config-yaml:4.1.0'
+    implementation 'io.vertx:vertx-web:4.1.0'
+    implementation 'io.vertx:vertx-web-client:4.1.0'
+    implementation 'io.vertx:vertx-json-schema:4.1.0'
+    implementation ('io.vertx:vertx-zookeeper:4.1.0') {
+        exclude (group: 'org.slf4j')
+    }
+    implementation 'io.vertx:vertx-micrometer-metrics:4.1.0'
+    implementation 'io.micrometer:micrometer-registry-prometheus:1.6.4'
+
+    // performance tuning: should align with netty version that vert.x uses
+    implementation 'io.netty:netty-transport-native-epoll:4.1.60.Final:linux-x86_64'
+    implementation 'io.netty:netty-transport-native-kqueue:4.1.60.Final:osx-x86_64' // for dev purpose
+
+    // logging
+    implementation 'org.apache.logging.log4j:log4j-api:2.9.1'
+    implementation 'org.apache.logging.log4j:log4j-core:2.9.1'
+    implementation 'org.apache.logging.log4j:log4j-slf4j-impl:2.9.1'
+    implementation 'com.lmax:disruptor:3.4.4'
+    implementation 'io.sentry:sentry-log4j2:4.3.0'
+
+    // annotation
+    implementation 'org.projectlombok:lombok:1.18.12'
+    annotationProcessor 'org.projectlombok:lombok:1.18.12'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.12'
+
+    // test (not using testImplementation for fast docker image build)
+    implementation 'io.vertx:vertx-junit5:4.1.0'
+}
+
+// setup JAVA_OPTS and environment variables
+// ref: https://docs.gradle.org/current/dsl/org.gradle.api.tasks.JavaExec.html#org.gradle.api.tasks.JavaExec:allJvmArgs
+run {
+    mainClassName = 'com.kakaomobility.connection.Main'
+
+    // interpret and generate a temporary file containing JAVA_OPTS string
+    doFirst {
+        exec {
+            commandLine project.file("./set-java-opts.sh")
+        }
+    }
+
+    // apply JVM args
+    File setJavaOptsOutput = project.file("./set-java-opts.out")
+    if (setJavaOptsOutput.exists()) {
+        setApplicationDefaultJvmArgs setJavaOptsOutput.text.split(" ").toList().findAll {t -> !t.blank}
+    } else {
+        print "${setJavaOptsOutput.canonicalPath} file not exists: skip injecting JAVA_OPTS for gradle JVM\n"
+    }
+}
+
+test {
+    useJUnitPlatform()
+
+    // apply env
+    environment "APP_PROFILE", "TEST"
+
+    // interpret and generate a temporary file containing JAVA_OPTS string
+    doFirst {
+        exec {
+            commandLine project.file("./set-java-opts.sh")
+        }
+    }
+
+    // apply JVM args
+    File setJavaOptsOutput = project.file("./set-java-opts.out")
+    if (setJavaOptsOutput.exists()) {
+        setJvmArgs setJavaOptsOutput.text.split(" ").toList().findAll {t -> !t.blank}
+    } else {
+        print "${setJavaOptsOutput.canonicalPath} file not exists: skip injecting JAVA_OPTS for gradle JVM\n"
+    }
+}

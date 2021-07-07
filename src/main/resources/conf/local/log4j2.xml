@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- same file for TEST, LOCAL -->
+<Configuration
+        xmlns:xi="http://www.w3.org/2001/XInclude"
+        packages="org.apache.logging.log4j.core,io.sentry.log4j2"
+        shutdownHook="disable"
+        status="INFO"
+>
+    <xi:include href="../log4j2-default.xml"/>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="STDOUT"/>
+            <AppenderRef ref="SENTRY" level="WARN"/>
+        </Root>
+    </Loggers>
+</Configuration>

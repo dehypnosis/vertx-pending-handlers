@@ -1,0 +1,15 @@
+*.log*
+
+# Intellij
+.idea/
+*.iml
+*.iws
+*.ipr
+
+.gradle/
+.gradle
+!gradle-wrapper.jar
+
+.vertx
+build
+set-java-opts.out
